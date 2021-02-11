@@ -143,6 +143,7 @@ class PluginManager {
 		if ($this->populated) {
 			return;
 		}
+		$this->populated = true;
 
 		foreach ($this->appManager->getInstalledApps() as $app) {
 			// load plugins and collections from info.xml
