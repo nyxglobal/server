@@ -370,6 +370,8 @@ export default {
 
 	data() {
 		return {
+			alreadyCreated: false,
+
 			copySuccess: true,
 			copied: false,
 
@@ -680,6 +682,11 @@ export default {
 		 */
 		async pushNewLinkShare(share, update) {
 			try {
+				if (this.alreadyCreated) {
+					return true
+				}
+				this.alreadyCreated = true
+
 				this.loading = true
 				this.errors = {}
 
