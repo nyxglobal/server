@@ -1959,7 +1959,7 @@ class CalDavBackend extends AbstractBackend implements SyncSupport, Subscription
 	 * @param int $calendarType
 	 * @return array
 	 */
-	public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, $limit = null, $calendarType = self::CALENDAR_TYPE_CALENDAR) {
+	public function getChangesForCalendar($calendarId, $syncToken, $syncLevel, ?int $limit = null, $calendarType = self::CALENDAR_TYPE_CALENDAR) {
 		// Current synctoken
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('synctoken')
@@ -1968,10 +1968,9 @@ class CalDavBackend extends AbstractBackend implements SyncSupport, Subscription
 				$qb->expr()->eq('id', $qb->createNamedParameter($calendarId))
 			);
 		$stmt = $qb->execute();
-		$row = $stmt->fetch();
-		$currentToken = $row['synctoken'];
+		$currentToken = $stmt->fetchOne();
 
-		if (is_null($currentToken)) {
+		if ($currentToken === false) {
 			return null;
 		}
 
@@ -1991,6 +1990,7 @@ class CalDavBackend extends AbstractBackend implements SyncSupport, Subscription
 					$qb->expr()->andX(
 						$qb->expr()->gte('synctoken', $qb->createNamedParameter($syncToken)),
 						$qb->expr()->lt('synctoken', $qb->createNamedParameter($currentToken)),
+						$qb->expr()->eq('calendarid', $qb->createNamedParameter($calendarId)),
 						$qb->expr()->eq('calendartype', $qb->createNamedParameter($calendarType))
 					)
 				)->orderBy('synctoken');
